@@ -1,0 +1,69 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.10  # Install Python 3.10 on the temporary environment
+
+    commands:
+      - curl -O https://bootstrap.pypa.io/get-pip.py
+      - python3 get-pip.py
+      - echo Installing cfn-lint
+      - pip3 install cfn-lint
+
+  pre_build:
+    commands:
+      - echo ==== WE ARE ENTERING THE PREBUILD STAGE ====
+      - echo CHECKING THE VERSION OF PYTHON INSTALLED
+      - python --version
+      - echo CHECKING IF CFN-LINT WAS INSTALLED
+      - cfn-lint --version
+
+  build:
+    commands:
+      - echo "==== Build started on `date` ===="
+      - echo CHECK IF THE TEMPLATE IS PRESENT
+      - ls -l
+      - echo VALIDATING THE CLOUDFORMATION TEMPLATE
+      - cfn-lint Ec2WithCustomFotsovpc.yml # from the codecommit repo
+      - echo BUILD THE CLOUDFORMATION TEMPLATE
+      - aws cloudformation package --template-file Ec2WithCustomFotsovpc.yml --s3-bucket fotso-deployed-artifact-bucket --output-template-file build-artifact-template.yml
+
+  post_build:
+    commands:
+      - echo "==== Build completed at `date` ===="
+
+artifacts:
+  files:
+    - build-artifact-template.yml # represents all files from recursively, will zip files as an artifact and hand it over to the deployed stage (the generated file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
